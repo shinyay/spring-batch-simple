@@ -31,6 +31,15 @@ public class JobConfiguration {
     }
 
     @Bean
+    public Step step2() {
+        return stepBuilderFactory.get("step2")
+                .tasklet((contribution, chunkContext) -> {
+                    System.out.println(">> STEP2");
+                    return RepeatStatus.FINISHED;
+                }).build();
+    }
+
+    @Bean
     public Job transitionSimpleJobNext() {
         return jobBuilderFactory.get("transitionJobNext")
                 .start(step1())
