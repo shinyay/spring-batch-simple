@@ -8,6 +8,7 @@ import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 @Configuration
 public class FlowConfiguration {
@@ -58,7 +59,8 @@ public class FlowConfiguration {
 
         return jobBuilderFactory.get("job")
                 .start(flow1)
-                .next(flow2)
+                .split(new SimpleAsyncTaskExecutor())
+                .add(flow2)
                 .end()
                 .build();
     }
