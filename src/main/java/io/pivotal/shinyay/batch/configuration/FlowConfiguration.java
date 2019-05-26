@@ -29,6 +29,7 @@ public class FlowConfiguration {
                         stepBuilderFactory.get("step1")
                                 .tasklet((contribution, chunkContext) -> {
                                     System.out.println(">> Flow1-Step1: " + chunkContext.getStepContext().getStepName());
+                                    System.out.println(">> Flow1-Step1[Thread]: " + Thread.currentThread().getName());
                                     return RepeatStatus.FINISHED;
                                 }).build())
                 .build();
@@ -41,12 +42,14 @@ public class FlowConfiguration {
                         stepBuilderFactory.get("step2")
                                 .tasklet((contribution, chunkContext) -> {
                                     System.out.println(">> Flow2-Step2: " + chunkContext.getStepContext().getStepName());
+                                    System.out.println(">> Flow2-Step2[Thread]: " + Thread.currentThread().getName());
                                     return RepeatStatus.FINISHED;
                                 }).build())
                 .next(
                         stepBuilderFactory.get("step3")
                                 .tasklet((contribution, chunkContext) -> {
                                     System.out.println(">> Flow2-Step3: " + chunkContext.getStepContext().getStepName());
+                                    System.out.println(">> Flow2-Step3[Thread]: " + Thread.currentThread().getName());
                                     return RepeatStatus.FINISHED;
                                 }).build())
                 .build();
