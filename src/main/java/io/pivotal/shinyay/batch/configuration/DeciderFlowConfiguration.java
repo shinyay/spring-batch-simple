@@ -9,12 +9,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ConditionalFlowConfiguration {
+public class DeciderFlowConfiguration {
 
     private JobBuilderFactory jobBuilderFactory;
     private StepBuilderFactory stepBuilderFactory;
 
-    public ConditionalFlowConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
+    public DeciderFlowConfiguration(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory) {
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
     }
@@ -30,7 +30,7 @@ public class ConditionalFlowConfiguration {
 
     @Bean
     public Job conditionalJob() {
-        return jobBuilderFactory.get("conditional-job")
+        return jobBuilderFactory.get("decider-job")
                 .start(startStep())
                 .build();
     }
