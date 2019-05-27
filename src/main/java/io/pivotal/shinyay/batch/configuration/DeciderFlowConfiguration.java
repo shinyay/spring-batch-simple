@@ -25,7 +25,7 @@ public class DeciderFlowConfiguration {
     public Step startStep() {
         return stepBuilderFactory.get("start-step")
                 .tasklet((contribution, chunkContext) -> {
-                    System.out.println("START-TASKLET");
+                    System.out.println(">> START-TASKLET");
                     return RepeatStatus.FINISHED;
                 }).build();
     }
@@ -39,7 +39,7 @@ public class DeciderFlowConfiguration {
     public Step evenStep() {
         return stepBuilderFactory.get("even-step")
                 .tasklet((contribution, chunkContext) -> {
-                    System.out.println("EVEN-TASKLET");
+                    System.out.println(">> EVEN-TASKLET");
                     return RepeatStatus.FINISHED;
                 }).build();
     }
@@ -48,7 +48,7 @@ public class DeciderFlowConfiguration {
     public Step oddStep() {
         return stepBuilderFactory.get("odd-step")
                 .tasklet((contribution, chunkContext) -> {
-                    System.out.println("ODD-TASKLET");
+                    System.out.println(">> ODD-TASKLET");
                     return RepeatStatus.FINISHED;
                 }).build();
     }
