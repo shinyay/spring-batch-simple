@@ -1,5 +1,8 @@
 package io.pivotal.shinyay.batch.configuration;
 
+import io.pivotal.shinyay.batch.configuration.listener.ChunkListener;
+import io.pivotal.shinyay.batch.configuration.listener.JobListener;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -23,13 +26,32 @@ public class ListenerJobConfiguration {
     }
 
     @Bean
-    public ItemReader<String> reader() {
-        return new ListItemReader<String>(Arrays.asList("One","Two","Three"));
+    public ItemReader<?> reader() {
+        return new ListItemReader<>(Arrays.asList("One", "Two", "Three", "Four", "Five"));
     }
 
     @Bean
-    public ItemWriter<String> writer() {
+    public ItemWriter<? super Object> writer() {
         return items -> items.forEach(System.out::println);
+    }
+
+    @Bean
+    public Step withListenerStep() {
+        return stepBuilderFactory.get("listener-step")
+                .chunk(2)
+                .faultTolerant()
+                .listener(new ChunkListener())
+                .reader(reader())
+                .writer(writer())
+                .build();
+    }
+
+    @Bean
+    public Job withListenerJob() {
+        return jobBuilderFactory.get("listener-job")
+                .start(withListenerStep())
+                .listener(new JobListener())
+                .build();
     }
 
 }
