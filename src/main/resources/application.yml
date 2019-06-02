@@ -6,4 +6,4 @@ spring:
     password: batch
   batch:
     job:
-      names:
+      names: basic-job
