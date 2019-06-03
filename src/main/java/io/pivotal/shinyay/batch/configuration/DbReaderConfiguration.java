@@ -8,10 +8,16 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.database.JdbcPagingItemReader;
+import org.springframework.batch.item.database.Order;
+import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class DbReaderConfiguration {
@@ -36,6 +42,26 @@ public class DbReaderConfiguration {
     }
 
     @Bean
+    JdbcPagingItemReader<Customer> pagingItemReader() {
+        JdbcPagingItemReader<Customer> reader = new JdbcPagingItemReader<>();
+        reader.setDataSource(this.dataSource);
+        reader.setFetchSize(10);
+        reader.setRowMapper(new CustomerRowMapper());
+
+        HashMap<String, Order> map = new HashMap<>();
+        map.put("id", Order.ASCENDING);
+
+        MySqlPagingQueryProvider queryProvider = new MySqlPagingQueryProvider();
+        queryProvider.setSelectClause("id, firstName, lastName, birthdate");
+        queryProvider.setFromClause("from customer");
+//        queryProvider.setSortKeys((Map<String, Order>) Collections.emptyMap().put("id", Order.ASCENDING));
+        queryProvider.setSortKeys(map);
+        reader.setQueryProvider(queryProvider);
+
+        return reader;
+    }
+
+    @Bean
     public ItemWriter<? super Object> customerItemWriter() {
        return items -> {
            items.forEach(
@@ -48,7 +74,8 @@ public class DbReaderConfiguration {
     public Step dbReaderStep() {
         return stepBuilderFactory.get("db-reader-step")
                 .chunk(10)
-                .reader(cursorItemReader())
+//                .reader(cursorItemReader())
+                .reader(pagingItemReader())
                 .writer(customerItemWriter())
                 .build();
     }
