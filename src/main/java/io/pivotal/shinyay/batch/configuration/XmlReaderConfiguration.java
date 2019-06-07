@@ -1,4 +1,5 @@
 package io.pivotal.shinyay.batch.configuration;
+
 import io.pivotal.shinyay.batch.domain.customer.Customer;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -11,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.xstream.XStreamMarshaller;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
@@ -28,12 +29,9 @@ public class XmlReaderConfiguration {
     @Bean
     public StaxEventItemReader<Customer> xmlItemReader() {
         XStreamMarshaller marshaller = new XStreamMarshaller();
-        marshaller.setAliases(
-                (Map<String, ?>) Collections.emptyMap().put(
-                        "customer",
-                        Customer.class
-                )
-        );
+        Map<String, Objectsrc/main/java/io/pivotal/shinyay/batch/configuration/XmlReaderConfiguration.java> map = new HashMap<>();
+        map.put("customer", Customer.class);
+        marshaller.setAliases(map);
 
         StaxEventItemReader<Customer> reader = new StaxEventItemReader<>();
         reader.setResource(new ClassPathResource("customer.xml"));
