@@ -29,7 +29,7 @@ public class XmlReaderConfiguration {
     @Bean
     public StaxEventItemReader<Customer> xmlItemReader() {
         XStreamMarshaller marshaller = new XStreamMarshaller();
-        Map<String, Objectsrc/main/java/io/pivotal/shinyay/batch/configuration/XmlReaderConfiguration.java> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("customer", Customer.class);
         marshaller.setAliases(map);
 
