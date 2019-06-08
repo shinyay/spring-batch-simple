@@ -1,13 +1,18 @@
 package io.pivotal.shinyay.batch.domain.customer;
 
+import org.springframework.batch.item.ResourceAware;
+import org.springframework.core.io.Resource;
+
 import java.util.Date;
 
-public class Customer {
+public class Customer implements ResourceAware {
 
     private long id;
     private String firstName;
     private String lastName;
     private Date birthdate;
+
+    private Resource resource;
 
     public Customer(long id, String firstName, String lastName, Date birthdate) {
         this.id = id;
@@ -56,5 +61,10 @@ public class Customer {
                 ", lastName='" + lastName + '\'' +
                 ", birthdate=" + birthdate +
                 '}';
+    }
+
+    @Override
+    public void setResource(Resource resource) {
+        this.resource = resource;
     }
 }
