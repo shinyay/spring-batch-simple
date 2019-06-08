@@ -13,5 +13,5 @@ spring:
 #    initialization-mode: always
   batch:
     job:
-      names: xml-reader-job
+      names: csv-reader-job
 #    initialize-schema: always
