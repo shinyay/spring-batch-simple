@@ -13,5 +13,5 @@ spring:
 #    initialization-mode: always
   batch:
     job:
-      names: custom-reader-job
+      names: basic-writer-job
 #    initialize-schema: always
