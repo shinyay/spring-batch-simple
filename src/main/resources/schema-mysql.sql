@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `customer` (
+CREATE TABLE IF NOT EXISTS `CUSTOMER` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `firstName` varchar(255) default NULL,
   `lastName` VARCHAR (255) DEFAULT NULL,
