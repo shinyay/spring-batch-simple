@@ -31,7 +31,7 @@ public class BasicWriterConfiguration {
     }
 
     @Bean
-    public ItemWriter<? super Object> basicItemWriter() {
+    public ItemWriter<Integer> basicItemWriter() {
         return items -> {
             System.out.println(String.format(">> Writing %s Items", items.size()));
             items.forEach(System.out::println);
@@ -41,7 +41,7 @@ public class BasicWriterConfiguration {
     @Bean
     public Step basicWriterStep() {
         return stepBuilderFactory.get("basic-writer-step")
-                .chunk(10)
+                .<Integer, Integer>chunk(10)
                 .reader(listItemReader())
                 .writer(basicItemWriter())
                 .build();
