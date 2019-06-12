@@ -1,6 +1,7 @@
 package io.pivotal.shinyay.batch.configuration;
 
 import io.pivotal.shinyay.batch.domain.customer.Customer;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -45,6 +46,13 @@ public class DbWriterConfiguration {
                 .<Customer, Customer>chunk(10)
                 .reader(fileItemReader)
                 .writer(jdbcBatchItemWriter())
+                .build();
+    }
+
+    @Bean
+    public Job dbWriterJob() {
+        return jobBuilderFactory.get("db-writer-job")
+                .start(dbWriterStep())
                 .build();
     }
 }
