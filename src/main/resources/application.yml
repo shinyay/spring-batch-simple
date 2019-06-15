@@ -13,5 +13,5 @@ spring:
 #    initialization-mode: always
   batch:
     job:
-      names: xml-writer-job
+      names: file-writer-job
 #    initialize-schema: always
