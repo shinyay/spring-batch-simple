@@ -8,7 +8,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.file.FlatFileItemWriter;
-import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +37,7 @@ public class FlatFileWriterConfiguration {
     public FlatFileItemWriter<Customer> flatFileItemWriter() throws Exception {
         String output = File.createTempFile("customerOutput", ".out").getAbsolutePath();
         logger.info(">> Output FilePath: " + output);
-//        return new FlatFileItemWriterBuilder<Customer>()
-//                .lineAggregator(new PassThroughLineAggregator<Customer>())
-//                .resource(new FileSystemResource(output))
-//                .build();
+
         FlatFileItemWriter<Customer> flatFileItemWriter = new FlatFileItemWriter<>();
         flatFileItemWriter.setLineAggregator(new PassThroughLineAggregator<Customer>());
         flatFileItemWriter.setResource(new FileSystemResource(output));
