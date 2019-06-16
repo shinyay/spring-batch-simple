@@ -1,5 +1,7 @@
 package io.pivotal.shinyay.batch.configuration;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.pivotal.shinyay.batch.domain.customer.Customer;
 import io.pivotal.shinyay.batch.domain.customer.CustomerLineAggregator;
 import io.pivotal.shinyay.batch.domain.customer.CustomerRowMapper;
@@ -72,7 +74,15 @@ public class CompositeItemWriterConfiguration {
         logger.info(">> Json-Output Path: " + output);
 
         FlatFileItemWriter<Customer> jsonWriter = new FlatFileItemWriter<>();
-        jsonWriter.setLineAggregator(new CustomerLineAggregator());
+//        jsonWriter.setLineAggregator(new CustomerLineAggregator());
+        jsonWriter.setLineAggregator(item -> {
+            try {
+                return new ObjectMapper().writeValueAsString(item);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+                return e.getMessage();
+            }
+        });
         jsonWriter.setResource(new FileSystemResource(output));
         jsonWriter.afterPropertiesSet();
         return jsonWriter;
