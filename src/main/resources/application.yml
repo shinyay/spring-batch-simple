@@ -13,5 +13,5 @@ spring:
     initialization-mode: always
   batch:
     job:
-      names: composite-writer-job
+      names: basic-processor-job
     initialize-schema: always
