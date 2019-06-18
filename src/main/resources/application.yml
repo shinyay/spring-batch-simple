@@ -13,5 +13,5 @@ spring:
     initialization-mode: always
   batch:
     job:
-      names: restart-tasklet-job
+      names: composite-processor-job
     initialize-schema: always
