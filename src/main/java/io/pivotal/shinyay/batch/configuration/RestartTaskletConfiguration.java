@@ -22,6 +22,7 @@ public class RestartTaskletConfiguration {
     }
 
     @Bean
+    @StepScope
     public Tasklet restartTasklet() {
         return (contribution, chunkContext) -> {
             if(chunkContext.getStepContext().getStepExecutionContext().containsKey("STARTED")) {
