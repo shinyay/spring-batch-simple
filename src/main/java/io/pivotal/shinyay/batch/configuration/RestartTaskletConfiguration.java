@@ -31,7 +31,6 @@ public class RestartTaskletConfiguration {
             } else {
                 System.out.println(">>> JOB is not Running");
                 chunkContext.getStepContext().getStepExecution().getExecutionContext().put("STARTED", true);
-//                chunkContext.getStepContext().getStepExecutionContext().put("STARTED", true);
                 throw new RuntimeException("Not Started");
             }
         };
