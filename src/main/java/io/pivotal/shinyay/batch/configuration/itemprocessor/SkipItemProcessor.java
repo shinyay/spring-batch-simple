@@ -3,7 +3,7 @@ package io.pivotal.shinyay.batch.configuration.itemprocessor;
 import org.springframework.batch.item.ItemProcessor;
 
 public class SkipItemProcessor implements ItemProcessor<String, String> {
-    private int execsrc/main/java/io/pivotal/shinyay/batch/configuration/itemprocessor/SkipItemProcessor.javaCount = 0;
+    private int execCount = 0;
 
     @Override
     public String process(String item) throws Exception {
