@@ -16,12 +16,12 @@ public class CustomerSkipListener implements SkipListener {
     @Override
     public void onSkipInWrite(Object item, Throwable t) {
         logger.info(">> Skipping: " + item);
-        logger.info(">> Failed processing: " + t);
+        logger.info(">> Failed writing: " + t);
     }
 
     @Override
     public void onSkipInProcess(Object item, Throwable t) {
         logger.info(">> Skipping: " + item);
-        logger.info(">> Failed writing: " + t);
+        logger.info(">> Failed processing: " + t);
     }
 }
