@@ -26,7 +26,7 @@ public class SkipListenerConfiguration {
     }
 
     @Bean
-    public ListItemReader<String> listItemReader() {
+    public ListItemReader<String> listStringItemReader() {
         return new ListItemReader<String>(
                 IntStream.rangeClosed(1,100)
                         .boxed()
@@ -44,13 +44,20 @@ public class SkipListenerConfiguration {
     public Step skipListenerStep() {
         return stepBuilderFactory.get("skip-listener-step")
                 .<String, String>chunk(10)
-                .reader(listItemReader())
+                .reader(listStringItemReader())
                 .processor(skipItemProcessor())
                 .writer(skipItemWriter())
                 .faultTolerant()
                 .skip(RuntimeException.class)
                 .skipLimit(15)
                 .listener(new CustomerSkipListener())
+                .build();
+    }
+
+    @Bean
+    public Job skipListenerJob() {
+        return jobBuilderFactory.get("skip-listener-job")
+                .start(skipListenerStep())
                 .build();
     }
 }
