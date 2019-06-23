@@ -21,5 +21,14 @@ public class AsyncItemProcessorConfiguration {
 
     @Autowired
     ListItemReader<String> listStringItemReader;
-    
+
+    @Bean
+    ItemProcessor<String, String> slowItemProcessor() {
+        return item -> {
+            Thread.sleep(1000);
+            System.out.println("[" + Thread.currentThread().getName() + "]::" + item);
+            item.toUpperCase();
+            return item;
+        };
+    }
 }
