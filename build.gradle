@@ -16,8 +16,10 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-batch'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-integration'
 	implementation 'org.springframework:spring-oxm'
 	implementation 'com.thoughtworks.xstream:xstream:1.4.9'
+	implementation 'org.springframework.batch:spring-batch-integration'
 	runtimeOnly 'mysql:mysql-connector-java'
 	runtimeOnly 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
