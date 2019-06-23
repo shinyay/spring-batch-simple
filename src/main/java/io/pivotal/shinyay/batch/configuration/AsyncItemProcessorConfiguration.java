@@ -27,8 +27,7 @@ public class AsyncItemProcessorConfiguration {
         return item -> {
             Thread.sleep(1000);
             System.out.println("[" + Thread.currentThread().getName() + "]::" + item);
-            item.toUpperCase();
-            return item;
+            return item.toUpperCase();
         };
     }
 }
