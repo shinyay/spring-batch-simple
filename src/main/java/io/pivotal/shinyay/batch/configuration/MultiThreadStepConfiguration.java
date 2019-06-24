@@ -4,6 +4,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +39,7 @@ public class MultiThreadStepConfiguration {
         return stepBuilderFactory.get("multi-thread-step")
                 .<String, String>chunk(10)
                 .reader(listStringItemReader)
+                .processor((ItemProcessor<String, String>) item -> item.toUpperCase())
                 .writer(items -> {items.forEach(item -> System.out.println("[" + Thread.currentThread().getName() + "]::" + item));})
                 .faultTolerant()
                 .taskExecutor(threadPoolExecutor())
