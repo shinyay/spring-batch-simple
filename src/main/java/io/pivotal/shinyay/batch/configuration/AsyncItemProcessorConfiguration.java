@@ -1,5 +1,6 @@
 package io.pivotal.shinyay.batch.configuration;
 
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -13,7 +14,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.function.Function;
+import java.util.concurrent.Future;
+
 
 @Configuration
 public class AsyncItemProcessorConfiguration {
@@ -42,7 +44,7 @@ public class AsyncItemProcessorConfiguration {
     }
 
     @Bean
-    public AsyncItemProcessor<String, String> asyncItemProcessor() throws Exception {
+    public ItemProcessor<String, Future<String>> asyncItemProcessor() throws Exception {
         AsyncItemProcessor<String, String> asyncItemProcessor = new AsyncItemProcessor<>();
         asyncItemProcessor.setDelegate(slowItemProcessor());
         asyncItemProcessor.setTaskExecutor(threadPoolExecutor);
@@ -51,7 +53,7 @@ public class AsyncItemProcessorConfiguration {
     }
 
     @Bean
-    public AsyncItemWriter<String> asyncItemWriter() throws Exception {
+    public ItemWriter<Future<String>> asyncItemWriter() throws Exception {
         AsyncItemWriter<String> asyncItemWriter = new AsyncItemWriter<>();
         asyncItemWriter.setDelegate(items ->
                 items.forEach(item ->
@@ -64,10 +66,17 @@ public class AsyncItemProcessorConfiguration {
     @Bean
     public Step asyncProcessorStep() throws Exception {
         return stepBuilderFactory.get("async-processor-step")
-                .<String, String>chunk(10)
+                .<String, Future<String>>chunk(10)
                 .reader(listStringItemReader)
-                .processor((Function<String, String>) asyncItemProcessor())
-                .writer((ItemWriter) asyncItemWriter())
+                .processor(asyncItemProcessor())
+                .writer(asyncItemWriter())
+                .build();
+    }
+
+    @Bean
+    public Job asyncProcessorJob() throws Exception {
+        return jobBuilderFactory.get("async-processor-job")
+                .start(asyncProcessorStep())
                 .build();
     }
 }
