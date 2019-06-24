@@ -3,6 +3,7 @@ package io.pivotal.shinyay.batch.configuration;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.integration.async.AsyncItemProcessor;
+import org.springframework.batch.integration.async.AsyncItemWriter;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class AsyncItemProcessorConfiguration {
     public ItemProcessor<String, String> slowItemProcessor() {
         return item -> {
             Thread.sleep(1000);
-            System.out.println("[" + Thread.currentThread().getName() + "]::" + item);
+            System.out.println("[" + Thread.currentThread().getName() + "]:: Processing " + item);
             return item.toUpperCase();
         };
     }
@@ -43,5 +44,16 @@ public class AsyncItemProcessorConfiguration {
         asyncItemProcessor.setTaskExecutor(threadPoolExecutor);
         asyncItemProcessor.afterPropertiesSet();
         return asyncItemProcessor;
+    }
+
+    @Bean
+    public AsyncItemWriter<String> asyncItemWriter() throws Exception {
+        AsyncItemWriter<String> asyncItemWriter = new AsyncItemWriter<>();
+        asyncItemWriter.setDelegate(items ->
+                items.forEach(item ->
+                        System.out.println("[" + Thread.currentThread().getName() + "]::Writing " + item)
+                ));
+        asyncItemWriter.afterPropertiesSet();
+        return asyncItemWriter;
     }
 }
