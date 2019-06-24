@@ -13,5 +13,5 @@ spring:
 #    initialization-mode: always
   batch:
     job:
-      names: multi-thread-job
+      names: async-processor-job
 #    initialize-schema: always
