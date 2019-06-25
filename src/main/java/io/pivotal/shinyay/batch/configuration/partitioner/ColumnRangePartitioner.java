@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ColumnRangePartitioner implements Partitioner {
@@ -36,6 +37,26 @@ public class ColumnRangePartitioner implements Partitioner {
 
         int targetSize = (max - min) / gridSize + 1;
 
-        return null;
+        HashMap<String, ExecutionContext> result = new HashMap<>();
+        int number = 0;
+        int start = min;
+        int end = start + targetSize - 1;
+
+        while(start <= max) {
+            ExecutionContext context = new ExecutionContext();
+            result.put("PARTITION:" + number, context);
+
+            context.putInt("MIN-VALUE", start);
+            context.putInt("MAS-VALUE", end);
+
+            if(end >= max) {
+                end = max;
+            }
+
+            start += targetSize;
+            end += targetSize;
+            number++;
+        }
+        return result;
     }
 }
