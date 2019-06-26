@@ -13,5 +13,5 @@ spring:
     initialization-mode: always
   batch:
     job:
-      names: local-partition-jobg
+      names: local-partition-job
     initialize-schema: always
