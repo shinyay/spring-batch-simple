@@ -7,9 +7,11 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
+import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
@@ -47,15 +49,20 @@ public class LocalPartitionConfiguration {
     }
 
     @Bean
+    @StepScope
     public JdbcPagingItemReader<Customer> pagingItemReaderWithParams(
-            @Value("#{stepExecutionContext['MIN-VALUE']}") long minValue,
-            @Value("#{stepExecutionContext['MAX-VALUE']}") long maxValue) {
+            @Value("#{stepExecutionContext['minValue']}") long minValue,
+            @Value("#{stepExecutionContext['maxValue']}") long maxValue) {
+        System.out.println(">>> pagingItemReaderWithParams");
         System.out.println(">> READ FROM:" + minValue + " TO:" + maxValue);
 
         MySqlPagingQueryProvider queryProvider = new MySqlPagingQueryProvider();
         queryProvider.setSelectClause("id, firstName, lastName, birthdate");
         queryProvider.setFromClause("from customer");
-        queryProvider.setWhereClause("where id >= $minValue and id < $maxValue");
+        queryProvider.setWhereClause("where id >= :minValue and id < :maxValue");
+        HashMap<String, Order> sortKeyMap = new HashMap<>();
+        sortKeyMap.put("id", Order.ASCENDING);
+        queryProvider.setSortKeys(sortKeyMap);
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("minValue", minValue);
@@ -74,13 +81,14 @@ public class LocalPartitionConfiguration {
     public JdbcBatchItemWriter<Customer> jdbcBatchItemWriterNewCustomer() {
         return new JdbcBatchItemWriterBuilder<Customer>()
                 .dataSource(dataSource)
-                .sql("INSERT INTO NEW_CUSTOMER VALUES (:id, :firstName, :lastName, :birthdate)")
+                .sql("INSERT INTO new_customer VALUES (:id, :firstName, :lastName, :birthdate)")
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Customer>())
                 .build();
     }
 
     @Bean
     public Step slaveStep() {
+        System.out.println(">>> SLAVE STEP");
         return stepBuilderFactory.get("slave-step")
                 .<Customer, Customer>chunk(10)
                 .reader(pagingItemReaderWithParams(0, 1))
@@ -89,7 +97,7 @@ public class LocalPartitionConfiguration {
     }
 
     @Bean
-    Step masterStep() {
+    public Step masterStep() {
         return stepBuilderFactory.get("master-step")
                 .partitioner(slaveStep().getName(), partitioner())
                 .step(slaveStep())
@@ -99,7 +107,7 @@ public class LocalPartitionConfiguration {
     }
 
     @Bean
-    Job localPartitionJob() {
+    public Job localPartitionJob() {
         return jobBuilderFactory.get("local-partition-job")
                 .start(masterStep())
                 .build();
