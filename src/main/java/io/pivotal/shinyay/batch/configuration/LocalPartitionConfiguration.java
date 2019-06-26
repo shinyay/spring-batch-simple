@@ -12,9 +12,11 @@ import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
 import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -31,6 +33,9 @@ public class LocalPartitionConfiguration {
         this.stepBuilderFactory = stepBuilderFactory;
         this.dataSource = dataSource;
     }
+
+    @Autowired
+    ThreadPoolTaskExecutor threadPoolExecutor;
 
     private String customerTableName = "customer";
     private String customerNetTableName = "new_customer";
@@ -74,7 +79,7 @@ public class LocalPartitionConfiguration {
     }
 
     @Bean
-    public Step slaveSterp() {
+    public Step slaveStep() {
         return stepBuilderFactory.get("slave-step")
                 .<Customer, Customer>chunk(10)
                 .reader(pagingItemReaderWithParams(0, 1))
@@ -82,5 +87,12 @@ public class LocalPartitionConfiguration {
                 .build();
     }
 
-    
+    @Bean Step masterStep() {
+        return stepBuilderFactory.get("master-step")
+                .partitioner(slaveStep().getName(), partitioner())
+                .step(slaveStep())
+                .gridSize(4)
+                .taskExecutor(threadPoolExecutor)
+                .build();src/main/java/io/pivotal/shinyay/batch/configuration/LocalPartitionConfiguration.java
+    }
 }
