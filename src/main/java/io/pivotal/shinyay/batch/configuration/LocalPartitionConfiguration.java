@@ -3,6 +3,7 @@ package io.pivotal.shinyay.batch.configuration;
 import io.pivotal.shinyay.batch.configuration.partitioner.ColumnRangePartitioner;
 import io.pivotal.shinyay.batch.domain.customer.Customer;
 import io.pivotal.shinyay.batch.domain.customer.CustomerRowMapper;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
@@ -71,4 +72,15 @@ public class LocalPartitionConfiguration {
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Customer>())
                 .build();
     }
+
+    @Bean
+    public Step slaveSterp() {
+        return stepBuilderFactory.get("slave-step")
+                .<Customer, Customer>chunk(10)
+                .reader(pagingItemReaderWithParams(0, 1))
+                .writer(jdbcBatchItemWriterNewCustomer())
+                .build();
+    }
+
+    
 }
