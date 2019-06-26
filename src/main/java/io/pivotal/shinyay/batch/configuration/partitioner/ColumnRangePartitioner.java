@@ -2,6 +2,7 @@ package io.pivotal.shinyay.batch.configuration.partitioner;
 
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -24,16 +25,13 @@ public class ColumnRangePartitioner implements Partitioner {
 
     @Override
     public Map<String, ExecutionContext> partition(int gridSize) {
+        System.out.println(">>> partition");
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        String minSQL = "SELECT MIN(id) from customer";
+        String maxSQL = "SELECT MAX(id) from customer";
 
-        NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-        String minSQL = "SELECT MIN(:column) from :table";
-        String maxSQL = "SELECT MAX(:column) from :table";
-        SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
-                .addValue("column", column)
-                .addValue("table", table);
-
-        Integer min = jdbcTemplate.queryForObject(minSQL, sqlParameterSource, Integer.class);
-        Integer max = jdbcTemplate.queryForObject(maxSQL, sqlParameterSource, Integer.class);
+        Integer min = jdbcTemplate.queryForObject(minSQL, Integer.class);
+        Integer max = jdbcTemplate.queryForObject(maxSQL, Integer.class);
 
         int targetSize = (max - min) / gridSize + 1;
 
@@ -46,8 +44,8 @@ public class ColumnRangePartitioner implements Partitioner {
             ExecutionContext context = new ExecutionContext();
             result.put("PARTITION:" + number, context);
 
-            context.putInt("MIN-VALUE", start);
-            context.putInt("MAS-VALUE", end);
+            context.putInt("minValue", start);
+            context.putInt("maxValue", end);
 
             if(end >= max) {
                 end = max;
