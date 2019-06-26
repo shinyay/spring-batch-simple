@@ -3,6 +3,7 @@ package io.pivotal.shinyay.batch.configuration;
 import io.pivotal.shinyay.batch.configuration.partitioner.ColumnRangePartitioner;
 import io.pivotal.shinyay.batch.domain.customer.Customer;
 import io.pivotal.shinyay.batch.domain.customer.CustomerRowMapper;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -87,12 +88,21 @@ public class LocalPartitionConfiguration {
                 .build();
     }
 
-    @Bean Step masterStep() {
+    @Bean
+    Step masterStep() {
         return stepBuilderFactory.get("master-step")
                 .partitioner(slaveStep().getName(), partitioner())
                 .step(slaveStep())
                 .gridSize(4)
                 .taskExecutor(threadPoolExecutor)
-                .build();src/main/java/io/pivotal/shinyay/batch/configuration/LocalPartitionConfiguration.java
+                .build();
     }
+
+    @Bean
+    Job localPartitionJob() {
+        return jobBuilderFactory.get("local-partition-job")
+                .start(masterStep())
+                .build();
+    }
+
 }
