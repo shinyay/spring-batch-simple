@@ -6,13 +6,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.amqp.outbound.AmqpOutboundEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.channel.NullChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.messaging.PollableChannel;
 
 @Configuration
 public class MessagingIntegration {
 
-    final static String queueName = "input";
+    private final static String queueName = "partition.request.queue";
 
     @Bean
     public MessagingTemplate messagingTemplate() {
@@ -24,6 +26,11 @@ public class MessagingIntegration {
     @Bean
     public DirectChannel outboundRequests() {
         return new DirectChannel();
+    }
+
+    @Bean
+    public PollableChannel outboundStaging() {
+        return new NullChannel();
     }
 
     @Bean
@@ -40,4 +47,6 @@ public class MessagingIntegration {
         outboundEndpoint.setRoutingKey(queueName);
         return outboundEndpoint;
     }
+
+
 }
