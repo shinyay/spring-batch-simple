@@ -63,7 +63,11 @@ public class MessagingIntegration {
     @Bean
     @Profile("slave")
     public AmqpInboundChannelAdapter inboundChannelAdapter(SimpleMessageListenerContainer listenerContainer) {
-
+        AmqpInboundChannelAdapter inboundChannelAdapter = new AmqpInboundChannelAdapter(listenerContainer);
+        inboundChannelAdapter.setOutputChannel(inboundRequests());
+        inboundChannelAdapter.afterPropertiesSet();
+        return inboundChannelAdapter;
     }
+    
 
 }
