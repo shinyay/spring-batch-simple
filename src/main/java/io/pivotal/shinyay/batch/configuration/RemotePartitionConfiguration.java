@@ -1,15 +1,19 @@
 package io.pivotal.shinyay.batch.configuration;
 
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.integration.partition.MessageChannelPartitionHandler;
+import org.springframework.batch.integration.partition.StepExecutionRequestHandler;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.core.MessagingTemplate;
 
 import javax.sql.DataSource;
@@ -50,4 +54,13 @@ public class RemotePartitionConfiguration implements ApplicationContextAware {
         partitionHandler.afterPropertiesSet();
         return partitionHandler;
     }
+
+    @Bean
+    @Profile("slave")
+    @ServiceActivator(inputChannel = "inboundRequests", outputChannel = "outboundStaging")
+    public StepExecutionRequestHandler stepExecutionRequestHandler() {
+        StepExecutionRequestHandler stepExecutionRequestHandler = new StepExecutionRequestHandler();
+        return stepExecutionRequestHandler;
+    }
+
 }
