@@ -68,6 +68,5 @@ public class MessagingIntegration {
         inboundChannelAdapter.afterPropertiesSet();
         return inboundChannelAdapter;
     }
-    
 
 }
