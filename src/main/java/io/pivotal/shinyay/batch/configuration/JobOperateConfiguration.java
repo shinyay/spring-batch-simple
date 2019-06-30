@@ -5,6 +5,7 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -52,6 +53,15 @@ public class JobOperateConfiguration implements ApplicationContextAware {
     }
 
     @Bean
+    public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() throws Exception {
+        JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
+        jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry);
+        jobRegistryBeanPostProcessor.setBeanFactory(applicationContext.getAutowireCapableBeanFactory());
+        jobRegistryBeanPostProcessor.afterPropertiesSet();
+        return jobRegistryBeanPostProcessor;
+    }
+
+    @Bean
     public JobOperator jobOperator() throws Exception {
         SimpleJobOperator jobOperator = new SimpleJobOperator();
         jobOperator.setJobLauncher(jobLauncher);
@@ -69,7 +79,7 @@ public class JobOperateConfiguration implements ApplicationContextAware {
         String realName = name.isEmpty() ? "no-name-provided" : name;
 
         return (contribution, chunkContext) -> {
-            System.out.println(">>> NAME: " + name);
+            System.out.println(">>> NAME: " + realName);
             return RepeatStatus.FINISHED;
         };
     }
