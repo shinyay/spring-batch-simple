@@ -1,5 +1,6 @@
 package io.pivotal.shinyay.batch.configuration;
 
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -71,5 +72,14 @@ public class JobOperateConfiguration implements ApplicationContextAware {
             System.out.println(">>> NAME: " + name);
             return RepeatStatus.FINISHED;
         };
+    }
+
+    @Bean
+    public Job parameterizedTaskletJob() {
+        return jobBuilderFactory.get("parameter-tasklet-job")
+                .start(stepBuilderFactory.get("parameter-tasklet-step")
+                        .tasklet(parameterizedTasklet(null))
+                        .build())
+                .build();
     }
 }
