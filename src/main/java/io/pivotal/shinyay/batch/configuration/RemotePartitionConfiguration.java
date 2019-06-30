@@ -22,7 +22,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.integration.scheduling.PollerMetadata;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.support.PeriodicTrigger;
 
 import javax.sql.DataSource;
 
@@ -76,6 +78,13 @@ public class RemotePartitionConfiguration implements ApplicationContextAware {
         partitionHandler.setJobExplorer(jobExplorer);
         partitionHandler.afterPropertiesSet();
         return partitionHandler;
+    }
+
+    @Bean(PollerMetadata.DEFAULT_POLLER)
+    public PollerMetadata defautPoller() {
+        PollerMetadata pollerMetadata = new PollerMetadata();
+        pollerMetadata.setTrigger(new PeriodicTrigger(10));
+        return pollerMetadata;
     }
 
     @Bean
