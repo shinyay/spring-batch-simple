@@ -2,6 +2,7 @@ package io.pivotal.shinyay.batch.configuration;
 
 import io.pivotal.shinyay.batch.configuration.partitioner.ColumnRangePartitioner;
 import io.pivotal.shinyay.batch.domain.customer.Customer;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -96,5 +97,12 @@ public class RemotePartitionConfiguration implements ApplicationContextAware {
                 .build();
     }
 
+    @Bean
+    @Profile("master")
+    public Job remotePartitionJob() throws Exception {
+        return jobBuilderFactory.get("remote-partition-job")
+                .start(masterStepWithPartitionHandler())
+                .build();
+    }
 
 }
