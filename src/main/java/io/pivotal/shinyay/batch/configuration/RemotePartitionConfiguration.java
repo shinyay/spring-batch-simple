@@ -1,5 +1,8 @@
 package io.pivotal.shinyay.batch.configuration;
 
+import io.pivotal.shinyay.batch.configuration.partitioner.ColumnRangePartitioner;
+import io.pivotal.shinyay.batch.domain.customer.Customer;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -7,7 +10,10 @@ import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.integration.partition.MessageChannelPartitionHandler;
 import org.springframework.batch.integration.partition.StepExecutionRequestHandler;
+import org.springframework.batch.item.database.JdbcBatchItemWriter;
+import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +21,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.core.MessagingTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.sql.DataSource;
 
@@ -37,6 +44,21 @@ public class RemotePartitionConfiguration implements ApplicationContextAware {
         this.dataSource = dataSource;
         this.jobExplorer = jobExplorer;
     }
+
+    @Autowired
+    private ColumnRangePartitioner partitioner;
+
+    @Autowired
+    private JdbcPagingItemReader<Customer> pagingItemReaderWithParams;
+
+    @Autowired
+    private JdbcBatchItemWriter<Customer> jdbcBatchItemWriterNewCustomer;
+
+    @Autowired
+    private Step slaveStep;
+
+    @Autowired
+    private ThreadPoolTaskExecutor threadPoolExecutor;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -62,5 +84,17 @@ public class RemotePartitionConfiguration implements ApplicationContextAware {
         StepExecutionRequestHandler stepExecutionRequestHandler = new StepExecutionRequestHandler();
         return stepExecutionRequestHandler;
     }
+
+    @Bean
+    public Step masterStepWithPartitionHandler() throws Exception {
+        return stepBuilderFactory.get("master-step-with-handler")
+                .partitioner(slaveStep.getName(), partitioner)
+                .partitionHandler(partitionHandler(null))
+                .step(slaveStep)
+                .gridSize(4)
+                .taskExecutor(threadPoolExecutor)
+                .build();
+    }
+
 
 }
