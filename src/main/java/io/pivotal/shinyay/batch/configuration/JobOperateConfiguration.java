@@ -12,7 +12,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class JobOprateConfiguration implements ApplicationContextAware {
+public class JobOperateConfiguration implements ApplicationContextAware {
 
     private JobBuilderFactory jobBuilderFactory;
     private StepBuilderFactory stepBuilderFactory;
@@ -21,12 +21,12 @@ public class JobOprateConfiguration implements ApplicationContextAware {
     private JobRepository jobRepository;
     private JobRegistry jobRegistry;
 
-    public JobOprateConfiguration(JobBuilderFactory jobBuilderFactory,
-                                  StepBuilderFactory stepBuilderFactory,
-                                  JobExplorer jobExplorer,
-                                  JobLauncher jobLauncher,
-                                  JobRepository jobRepository,
-                                  JobRegistry jobRegistry) {
+    public JobOperateConfiguration(JobBuilderFactory jobBuilderFactory,
+                                   StepBuilderFactory stepBuilderFactory,
+                                   JobExplorer jobExplorer,
+                                   JobLauncher jobLauncher,
+                                   JobRepository jobRepository,
+                                   JobRegistry jobRegistry) {
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
         this.jobExplorer = jobExplorer;
