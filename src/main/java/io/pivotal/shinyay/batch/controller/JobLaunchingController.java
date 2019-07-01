@@ -18,7 +18,8 @@ public class JobLaunchingController {
     @PostMapping(name = "/")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void launch(@RequestParam("name") String name) throws JobParametersInvalidException, JobInstanceAlreadyExistsException, NoSuchJobException {
-        jobOperator.start("parameter-tasklet-job", "name=" + name);
+        long jobExecutionId = jobOperator.start("parameter-tasklet-job", "name=" + name);
+        System.out.println(">>> JobExecutionId: " + jobExecutionId);
     }
 
     @DeleteMapping("/{id}")
