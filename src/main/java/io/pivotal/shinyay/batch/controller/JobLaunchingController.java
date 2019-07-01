@@ -1,14 +1,9 @@
 package io.pivotal.shinyay.batch.controller;
 
 import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
-import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.launch.*;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -26,4 +21,9 @@ public class JobLaunchingController {
         jobOperator.start("parameter-tasklet-job", "name=" + name);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void stop(@PathVariable("id") long id) throws NoSuchJobExecutionException, JobExecutionNotRunningException {
+        jobOperator.stop(id);
+    }
 }
