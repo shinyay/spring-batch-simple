@@ -2,6 +2,7 @@ package io.pivotal.shinyay.batch.configuration;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -10,6 +11,7 @@ import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -20,9 +22,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 @Configuration
-public class JobOperateConfiguration implements ApplicationContextAware {
+public class JobOperateConfiguration extends DefaultBatchConfigurer implements ApplicationContextAware {
 
     private JobBuilderFactory jobBuilderFactory;
     private StepBuilderFactory stepBuilderFactory;
@@ -80,7 +83,8 @@ public class JobOperateConfiguration implements ApplicationContextAware {
 
         return (contribution, chunkContext) -> {
             System.out.println(">>> NAME: " + realName);
-            return RepeatStatus.FINISHED;
+            Thread.sleep(1000);
+            return RepeatStatus.CONTINUABLE;
         };
     }
 
@@ -91,5 +95,18 @@ public class JobOperateConfiguration implements ApplicationContextAware {
                         .tasklet(parameterizedTasklet(null))
                         .build())
                 .build();
+    }
+
+    @Override
+    public JobLauncher getJobLauncher() {
+        SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+        jobLauncher.setJobRepository(jobRepository);
+        jobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
+        try {
+            jobLauncher.afterPropertiesSet();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return jobLauncher;
     }
 }
