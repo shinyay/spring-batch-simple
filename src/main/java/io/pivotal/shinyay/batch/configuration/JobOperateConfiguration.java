@@ -11,6 +11,7 @@ import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
@@ -23,6 +24,9 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Configuration
 public class JobOperateConfiguration extends DefaultBatchConfigurer implements ApplicationContextAware {
@@ -89,10 +93,29 @@ public class JobOperateConfiguration extends DefaultBatchConfigurer implements A
     }
 
     @Bean
+    @StepScope
+    public Tasklet displayDateTasklet() {
+        return (contribution, chunkContext) -> {
+            System.out.println(">>> Run at " + new SimpleDateFormat("hh:mm:ss").format(new Date()));
+            return RepeatStatus.FINISHED;
+        };
+    }
+
+    @Bean
     public Job parameterizedTaskletJob() {
         return jobBuilderFactory.get("parameter-tasklet-job")
                 .start(stepBuilderFactory.get("parameter-tasklet-step")
                         .tasklet(parameterizedTasklet(null))
+                        .build())
+                .build();
+    }
+
+    @Bean
+    public Job displayDateTaskletJob() {
+        return jobBuilderFactory.get("display-tasklet-job")
+                .incrementer(new RunIdIncrementer())
+                .start(stepBuilderFactory.get("display-tasklet-step")
+                        .tasklet(displayDateTasklet())
                         .build())
                 .build();
     }
