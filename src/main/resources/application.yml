@@ -13,6 +13,6 @@ spring:
 #    initialization-mode: always
   batch:
     job:
-#      names: local-partition-job
-      enabled: false
+      names: proxy-executionlistener-job
+      enabled: true
 #    initialize-schema: always
