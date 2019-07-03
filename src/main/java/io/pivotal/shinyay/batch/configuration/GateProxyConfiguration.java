@@ -76,7 +76,7 @@ public class GateProxyConfiguration implements ApplicationContextAware {
                 .<Integer, Integer>chunk(10)
                 .reader(listItemReader)
                 .writer(basicItemWriter)
-                .listener(jobExecutionListener())
+                .listener(chunkListener())
                 .build();
     }
 
