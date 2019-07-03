@@ -2,6 +2,7 @@ package io.pivotal.shinyay.batch.configuration;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemWriter;
@@ -67,6 +68,16 @@ public class GateProxyConfiguration implements ApplicationContextAware {
     @ServiceActivator(inputChannel = "events")
     public CharacterStreamWritingMessageHandler logger() {
         return CharacterStreamWritingMessageHandler.stdout();
+    }
+
+    @Bean
+    public Step proxyAssignedStep() throws Exception {
+        return stepBuilderFactory.get("proxy-chunklistener-step")
+                .<Integer, Integer>chunk(10)
+                .reader(listItemReader)
+                .writer(basicItemWriter)
+                .listener(jobExecutionListener())
+                .build();
     }
 
 }
