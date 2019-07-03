@@ -1,6 +1,7 @@
 package io.pivotal.shinyay.batch.configuration;
 
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -80,4 +81,11 @@ public class GateProxyConfiguration implements ApplicationContextAware {
                 .build();
     }
 
+    @Bean
+    public Job proxyAssignedJob() throws Exception {
+        return jobBuilderFactory.get("proxy-executionlistener-job")
+                .start(proxyAssignedStep())
+                .listener((JobExecutionListener) jobExecutionListener())
+                .build();
+    }
 }
